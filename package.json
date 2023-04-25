@@ -1,0 +1,14 @@
+{
+  "name": "tellochatserver",
+  "version": "1.0.0",
+  "description": "Serverside for hololens and text chatting application",
+  "main": "server.js",
+  "author": "Cameron Asher",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "short-uuid": "^4.2.2",
+    "ws": "^7.5.0"
+  }
+}
