@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 const WebSocket = require("ws");
 const RoomsManager = require("./RoomsManager");
+const DatabaseManager = require("./DatabaseManager");
 
 const server = require("http").createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -10,7 +11,7 @@ const rm = new RoomsManager();
 
 const port = process.env.PORT || 8080;
 app.use(cors());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 wss.on("connection", (socket) => {
   console.log("New connection");
@@ -36,6 +37,18 @@ wss.on("connection", (socket) => {
     rm.leave(socket, socket.room_id);
     socket.room_id = undefined;
   });
+});
+
+app.post("/rooms", async (req, res) => {
+  let room_name = req.body.room_name;
+  let room = await DatabaseManager.createRoom({ room_name });
+  res.send(room);
+});
+
+app.post("/:roomid/messages", async (req, res) => {
+  let message = req.body.content;
+  let roomid = req.params.roomid;
+  DatabaseManager.addMessage();
 });
 
 server.listen(port, () => console.log(`Running on http://localhost:${port}/`));
