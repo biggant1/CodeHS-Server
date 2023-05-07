@@ -1,7 +1,7 @@
 {
-  "name": "tellochatserver",
+  "name": "codehschat",
   "version": "1.0.0",
-  "description": "Serverside for hololens and text chatting application",
+  "description": "Serverside for codehs chatting application",
   "main": "server.js",
   "author": "Cameron Asher",
   "license": "MIT",
@@ -12,5 +12,8 @@
     "short-uuid": "^4.2.2",
     "sqlite3": "^5.1.6",
     "ws": "^7.5.0"
+  },
+  "scripts": {
+    "start": "node src/server.js"
   }
 }
