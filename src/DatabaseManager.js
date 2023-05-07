@@ -42,24 +42,30 @@ async function createRoom({ room_name }) {
 }
 
 async function addMessage({ author_id, content, room_id }) {
-  await knex("messages").insert({
-    id: uuid.generate(),
-    author_id: author_id,
-    content: content,
-    room_id: room_id,
-    created_at: Date.now(),
-  });
+  let message = await knex("messages")
+    .insert({
+      id: uuid.generate(),
+      author_id: author_id,
+      content: content,
+      room_id: room_id,
+      created_at: Date.now(),
+    })
+    .returning("*");
+  return message;
 }
 
 async function createAuthor({ display_name, email, password }) {
   let [salt, password_hash] = CryptoManager.generatePasswordHash(password);
-  await knex("authors").insert({
-    id: uuid.generate(),
-    display_name: display_name,
-    email: email,
-    salt: salt,
-    password_hash: password_hash,
-  });
+  let author = await knex("authors")
+    .insert({
+      id: uuid.generate(),
+      display_name: display_name,
+      email: email,
+      salt: salt,
+      password_hash: password_hash,
+    })
+    .returning("id", "display_name", "email");
+  return author;
 }
 
 async function getMessages(room_id, limit = 100, offset = 0) {
@@ -92,6 +98,7 @@ async function getAuthorByEmail(email) {
 
 async function deleteMessageById(message_id) {
   await knex("messages").where("id", message_id).del();
+  return { message_id };
 }
 
 async function getRooms(limit = 100) {

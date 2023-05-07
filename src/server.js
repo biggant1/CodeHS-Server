@@ -4,7 +4,6 @@ const cors = require("cors");
 const WebSocket = require("ws");
 const RoomsManager = require("./RoomsManager");
 const DatabaseManager = require("./DatabaseManager");
-const uuid = require("short-uuid");
 const CryptoManager = require("./CryptoManager");
 
 const server = require("http").createServer(app);
@@ -30,7 +29,7 @@ wss.on("connection", (socket) => {
       socket.room_id = undefined;
     } else if (event === "login") {
       let author_id = message;
-      socket.id = author_id;
+      socket.author_id = author_id;
     }
   });
 
@@ -55,6 +54,7 @@ app.post("/rooms", async (req, res) => {
 app.post("/rooms/:roomid/messages", async (req, res) => {
   let { content, author_id, encrypted_password } = req.body;
   let room_id = req.params.roomid;
+  console.log(content);
   if (!content || !author_id || !room_id)
     return res.status(400).send("Missing a required parameter");
 
@@ -68,7 +68,17 @@ app.post("/rooms/:roomid/messages", async (req, res) => {
   if (!CryptoManager.checkIfValid(password, author.salt, author.password_hash))
     return res.status(401).send("Invalid password!");
 
-  await DatabaseManager.addMessage({ author_id, content, room_id });
+  let message = await DatabaseManager.addMessage({
+    author_id,
+    content,
+    room_id,
+  });
+  rm.emit(
+    room_id,
+    JSON.stringify({ event: "message", content: message }),
+    author_socket
+  );
+
   res.send("Successfully sent message!");
 });
 
@@ -106,7 +116,9 @@ app.delete("/rooms/:roomid/messages/:messageid", async (req, res) => {
   )
     return res.status(401).send("Invalid password!");
 
-  DatabaseManager.deleteMessageById(msgAndAuthor.id);
+  let message = await DatabaseManager.deleteMessageById(msgAndAuthor.id);
+  rm.emit(room_id, JSON.stringify({ event: "delete", content: message }));
+
   res.send("Successfully deleted message!");
 });
 
@@ -119,12 +131,12 @@ app.post("/authors", async (req, res) => {
     return res.status(400).send("Password encryption is invalid");
   }
 
-  await DatabaseManager.createAuthor({
+  let author = await DatabaseManager.createAuthor({
     display_name,
     email,
     password,
   });
-  res.send("Successfully added user!");
+  res.json(author);
 });
 
 app.post("/authors/login", async (req, res) => {

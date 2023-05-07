@@ -11,7 +11,7 @@ class RoomsManager {
   emit(roomid, data, ws = "null") {
     if (!this.rooms[roomid]) return;
     this.rooms[roomid].forEach((socket) => {
-      if (socket.readyState === WebSocket.OPEN && ws !== socket) {
+      if (socket.readyState === WebSocket.OPEN) {
         socket.send(data);
       }
     });
@@ -29,7 +29,7 @@ class RoomsManager {
     let roomIndex = this.rooms[roomid].indexOf(socket);
     let socketIndex = this.sockets.indexOf(socket);
     this.rooms[roomid].splice(roomIndex, 1);
-    this.rooms[roomid].splice(socketIndex, 1);
+    this.sockets.splice(socketIndex, 1);
 
     if (this.rooms[roomid].length === 0) delete this.rooms[roomid];
   }

@@ -10,9 +10,7 @@
     <button onclick="sendData()">CLICK</button>
 
     <script>
-      let webSocket = new WebSocket(
-        "wss://mortifiedsecretassociate.memelord3.repl.co"
-      );
+      let webSocket = new WebSocket("wss://2945-172-90-234-16.ngrok-free.app/");
 
       webSocket.onopen = () => {
         webSocket.send(JSON.stringify(["join chat", ["12345"]]));
