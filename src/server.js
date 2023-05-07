@@ -27,9 +27,6 @@ wss.on("connection", (socket) => {
       if (!socket.room_id) return;
       rm.leave(socket, socket.room_id);
       socket.room_id = undefined;
-    } else if (event === "login") {
-      let author_id = message;
-      socket.author_id = author_id;
     }
   });
 
@@ -54,7 +51,7 @@ app.post("/rooms", async (req, res) => {
 app.post("/rooms/:roomid/messages", async (req, res) => {
   let { content, author_id, encrypted_password } = req.body;
   let room_id = req.params.roomid;
-  console.log(content);
+
   if (!content || !author_id || !room_id)
     return res.status(400).send("Missing a required parameter");
 
@@ -73,11 +70,7 @@ app.post("/rooms/:roomid/messages", async (req, res) => {
     content,
     room_id,
   });
-  rm.emit(
-    room_id,
-    JSON.stringify({ event: "message", content: message }),
-    author_socket
-  );
+  rm.emit(room_id, JSON.stringify({ event: "message", content: message }));
 
   res.send("Successfully sent message!");
 });
@@ -142,16 +135,16 @@ app.post("/authors", async (req, res) => {
 app.post("/authors/login", async (req, res) => {
   let { email, encrypted_password } = req.body;
   if (!email || !encrypted_password)
-    return res.status(400).send("Missing a required parameter");
+    return res.status(400).json("Missing a required parameter");
   let author = await DatabaseManager.getAuthorByEmail(email);
-  if (!author) return res.status(400).send(`No author with email ${email}`);
+  if (!author) return res.status(400).json(`No author with email ${email}`);
   let password = CryptoManager.decryptPassword(encrypted_password);
   if (password === "Invalid encryption") {
-    return res.status(400).send("Password encryption is invalid");
+    return res.status(400).json("Password encryption is invalid");
   }
 
   if (!CryptoManager.checkIfValid(password, author.salt, author.password_hash))
-    return res.status(401).send("Invalid password!");
+    return res.status(401).json("Incorrect password!");
 
   delete author["password_hash"];
   delete author["salt"];

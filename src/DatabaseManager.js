@@ -42,7 +42,7 @@ async function createRoom({ room_name }) {
 }
 
 async function addMessage({ author_id, content, room_id }) {
-  let message = await knex("messages")
+  let message_id = await knex("messages")
     .insert({
       id: uuid.generate(),
       author_id: author_id,
@@ -50,8 +50,18 @@ async function addMessage({ author_id, content, room_id }) {
       room_id: room_id,
       created_at: Date.now(),
     })
-    .returning("*");
-  return message;
+    .returning("id");
+  let message = await knex("messages")
+    .where("messages.id", message_id[0].id)
+    .join("authors", "messages.author_id", "authors.id")
+    .select(
+      "authors.display_name",
+      "authors.id as author_id",
+      "messages.id as message_id",
+      "content",
+      "created_at"
+    );
+  return message[0];
 }
 
 async function createAuthor({ display_name, email, password }) {
@@ -65,7 +75,7 @@ async function createAuthor({ display_name, email, password }) {
       password_hash: password_hash,
     })
     .returning("id", "display_name", "email");
-  return author;
+  return author[0];
 }
 
 async function getMessages(room_id, limit = 100, offset = 0) {
