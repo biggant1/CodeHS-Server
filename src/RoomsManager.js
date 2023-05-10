@@ -25,6 +25,7 @@ class RoomsManager {
   leave(socket, roomid) {
     if (!this.rooms[roomid]) return;
     let roomIndex = this.rooms[roomid].indexOf(socket);
+    if (roomIndex === -1) return;
     this.rooms[roomid].splice(roomIndex, 1);
 
     if (this.rooms[roomid].length === 0) delete this.rooms[roomid];

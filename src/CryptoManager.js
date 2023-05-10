@@ -59,10 +59,6 @@ function decryptPassword(encryptedPassword) {
   }
 }
 
-decryptPassword(
-  "BMaW1Fz4j1v5z6LJJrVY5RDlqRjIWUBISNmTIwTxPFfCmgsFoGey6FbBMlexc4JwOMiK8N48r6kVuVYrqZKezlpELU5xwQq/MPXk+phwaHxKvW1G9KzlTiwbf5q+hK7NEC8giLaqP9opoA7o6NDEORHZK7xvZ7UK449uf6oRTBo2v1LLHy5JezYJHkaqTpA7QLxfEcfqLp4Ph1o13ancGCMnTq9hYyNL2mWOBCGlrBNdXxaQWB2qguTmASXDOpeX3sYLXtk0HjZrwi+uYNYH7JD6vkqN2DIEgksaqFkgdJVMsINpalmS3uN6jJ10E27Tn1nMwLaORoftBvPY3ng8RQ=="
-);
-
 module.exports = {
   generatePasswordHash,
   checkIfValid,
