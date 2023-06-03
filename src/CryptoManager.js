@@ -21,7 +21,7 @@ function checkIfValid(password, salt, hash) {
     .pbkdf2Sync(password, salt, 1000, 64, `sha512`)
     .toString(`hex`);
 
-  return new_hash == hash;
+  return new_hash == hash; // TODO: consider using a timing safe equality function
 }
 
 /**
